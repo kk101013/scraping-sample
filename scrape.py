@@ -6,15 +6,15 @@ Webスクレイピングのサンプル。
 書籍の一覧（タイトル・価格・評価・在庫）を全ページ巡回して収集し、
 CSV と Excel に出力する。
 
-- スクレイピング学習用に用意された公式の練習サイトを対象にしているため、
-  利用規約・法的問題なく安全に実演できる。
+- スクレイピング学習用に用意された練習サイトを対象にしているため、
+  実案件より安全に動作確認しやすい。
 - 実案件では「対象サイト・取得項目・出力形式」をご要望に合わせて差し替える。
 """
 
-import csv
 import time
 import sys
 from pathlib import Path
+from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
@@ -58,7 +58,7 @@ def parse_books(html: str) -> list[dict]:
     for card in soup.select("article.product_pod"):
         link = card.select_one("h3 a")
         title = link.get("title", "").strip()
-        detail_url = BASE_URL + link.get("href", "")
+        detail_url = urljoin(BASE_URL, link.get("href", ""))
 
         # 価格（"£51.77" → 51.77）
         price_text = card.select_one("p.price_color").get_text(strip=True)
@@ -102,7 +102,7 @@ def main():
 
     print("スクレイピング開始 ...")
     while next_page:
-        url = BASE_URL + next_page
+        url = urljoin(BASE_URL, next_page)
         page_count += 1
         print(f"- ページ{page_count}: {url}")
 
